@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 
-public class ScanActivity extends Activity {
+public class ListActivity extends Activity {
 
     private PendingIntent nfcPendingIntent;
     private IntentFilter[] intentFiltersArray;
@@ -27,7 +27,7 @@ public class ScanActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan);
+        setContentView(R.layout.activity_list);
         tagsView = (TextView) findViewById(R.id.tags);
         Intent nfcIntent = new Intent(this, getClass());
         nfcIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -125,7 +125,7 @@ public class ScanActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_scan, menu);
+        getMenuInflater().inflate(R.menu.menu_list, menu);
         return true;
     }
 
