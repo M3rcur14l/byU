@@ -113,7 +113,7 @@ public class ListActivity extends Activity {
                     String payloadText = new String(payload, "UTF-8");
                     String[] values = payloadText.split(",");
                     //payload format: "id_shop,id_product,id_instance"
-                    getInfoOfProduct(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]));
+                    getInfoOfProduct(1, 1, 2);
                 }
             }
         }
@@ -220,16 +220,19 @@ public class ListActivity extends Activity {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("payment_method_nonce", nonce);
-        params.put("delivery", deliverable);
-        params.put("idShop", id_shop);
-        params.put("idProduct", id_product);
-        params.put("idInstance", id_instance);
+        params.put("delivery", 1);
+        params.put("idShop", 1);
+        params.put("idProduct", 1);
+        params.put("idInstance", 2);
         client.post("http://ec2-52-27-136-49.us-west-2.compute.amazonaws.com/pay.php", params,
                 new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int i, Header[] headers, byte[] bytes) {
                         Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
-                        ((TextView) findViewById(R.id.text)).setText(new String(bytes));
+                        String unlockCode = new String(bytes);
+                        NdefRecord record = NdefRecord.createTextRecord("en", unlockCode);
+                        NdefMessage ndefMessage = new NdefMessage(record);
+                        nfcAdpt.setNdefPushMessage(ndefMessage, ListActivity.this);
                     }
 
                     @Override
@@ -237,7 +240,6 @@ public class ListActivity extends Activity {
                         Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_SHORT).show();
 
                     }
-                    // Your implementation here
                 }
         );
     }

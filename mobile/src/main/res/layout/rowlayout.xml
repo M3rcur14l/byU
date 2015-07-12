@@ -20,7 +20,6 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="10dp"
         android:layout_toEndOf="@id/product_image"
-        android:text="Iphone 6"
         android:textColor="@android:color/white"
         android:textSize="20sp" />
 
@@ -31,7 +30,6 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_marginEnd="40dp"
-        android:text="€ 600"
         android:textColor="@android:color/white"
         android:textSize="25sp" />
 
