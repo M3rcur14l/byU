@@ -230,9 +230,12 @@ public class ListActivity extends Activity {
                     public void onSuccess(int i, Header[] headers, byte[] bytes) {
                         Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
                         String unlockCode = new String(bytes);
-                        NdefRecord record = NdefRecord.createTextRecord("en", unlockCode);
-                        NdefMessage ndefMessage = new NdefMessage(record);
-                        nfcAdpt.setNdefPushMessage(ndefMessage, ListActivity.this);
+                        Intent intent = new Intent(ListActivity.this,UnlockActivity.class);
+                        intent.putExtra("unlockCode", unlockCode);
+                        startActivity(intent);
+                        //NdefRecord record = NdefRecord.createTextRecord("en", unlockCode);
+                        //NdefMessage ndefMessage = new NdefMessage(record);
+                        //nfcAdpt.setNdefPushMessage(ndefMessage, ListActivity.this);
                         productList.clear();
                         productAdapter.notifyDataSetChanged();
                     }
