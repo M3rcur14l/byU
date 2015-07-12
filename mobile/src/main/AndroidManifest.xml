@@ -19,7 +19,7 @@
 
                 <data
                     android:host="ext"
-                    android:pathPrefix="/com.laps:byu"
+                    android:pathPrefix="/c:l"
                     android:scheme="vnd.android.nfc" />
             </intent-filter>
         </activity>

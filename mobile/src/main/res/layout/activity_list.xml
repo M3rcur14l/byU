@@ -38,7 +38,8 @@
             android:layout_alignParentEnd="true"
             android:textColor="@android:color/white"
             android:layout_marginTop="40dp"
-            android:text="BUY"/>
+            android:text="BUY"
+            android:onClick="onBraintreeSubmit"/>
 
     </RelativeLayout>
 

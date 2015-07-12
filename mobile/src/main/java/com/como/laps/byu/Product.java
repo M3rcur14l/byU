@@ -5,33 +5,27 @@ package com.como.laps.byu;
  */
 public class Product {
 
-    private String id;
     private String name;
-    private String photo;
-    private Float price;
+    private String photoUrl;
+    private float price;
     private boolean deliverable;
 
-    public Product(String id, String name, String photo, Float price, boolean deliverable) {
-        this.id = id;
+    public Product(String name, String photoUrl, float price, boolean deliverable) {
         this.name = name;
-        this.photo = photo;
+        this.photoUrl = photoUrl;
         this.price = price;
         this.deliverable = deliverable;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getPhoto() {
-        return photo;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public Float getPrice() {
+    public float getPrice() {
         return price;
     }
 

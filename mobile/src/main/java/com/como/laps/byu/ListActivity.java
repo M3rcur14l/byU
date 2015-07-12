@@ -4,22 +4,26 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.braintreepayments.api.dropin.BraintreePaymentActivity;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
+
+import org.apache.http.Header;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -31,33 +35,21 @@ public class ListActivity extends Activity {
     private IntentFilter[] intentFiltersArray;
     private NfcAdapter nfcAdpt;
     private List<Product> productList;
+    private ProductAdapter productAdapter;
+    private String clientToken = "";
+    private final static int REQUEST_CODE = 100;
+    private final static boolean DEBUG_MODE = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getRealSize(size);
         final View layout = findViewById(R.id.list_layout);
-        Bitmap b = BitmapUtils.getBitmap("background.png", this, size.x, size.y);
-        BitmapDrawable background = new BitmapDrawable(getResources(), b);
-        layout.setBackground(background);
+        layout.setBackground(getDrawable(R.mipmap.background));
         final ListView productListView = (ListView) findViewById(R.id.product_list);
-        List<Product> productList = new ArrayList<>();
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
-        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList = new ArrayList<>();
 
-        ProductAdapter productAdapter = new ProductAdapter(this, 0, productList);
+        productAdapter = new ProductAdapter(this, 0, productList);
         productListView.setAdapter(productAdapter);
 
         Intent nfcIntent = new Intent(this, getClass());
@@ -96,10 +88,8 @@ public class ListActivity extends Activity {
     }
 
     private void getTag(Intent i) throws UnsupportedEncodingException {
-
         if (i == null)
             return;
-
         String type = i.getType();
         String action = i.getAction();
 
@@ -117,11 +107,12 @@ public class ListActivity extends Activity {
                 for (NdefRecord record : records) {
                     byte[] payload = record.getPayload();
                     String payloadText = new String(payload, "UTF-8");
+                    String[] values = payloadText.split(",");
+                    //payload format: "id_shop,id_product,id_instance"
+                    getInfoOfProduct(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]));
                 }
             }
-
         }
-
     }
 
 
@@ -149,6 +140,106 @@ public class ListActivity extends Activity {
     protected void onPause() {
         super.onPause();
         nfcAdpt.disableForegroundDispatch(this);
+    }
+
+    public void getClientTokenFromServer() {
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("http://ec2-52-27-136-49.us-west-2.compute.amazonaws.com/getToken.php", new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int i, Header[] headers, String s, Throwable throwable) {
+                if (DEBUG_MODE)
+                    Toast.makeText(getApplicationContext(), "fail to get Token", Toast.LENGTH_SHORT).show();
+                clientToken = "";
+            }
+
+            @Override
+            public void onSuccess(int i, Header[] headers, String s) {
+                clientToken = s;
+                if (!clientToken.isEmpty()) {
+                    Intent intent = new Intent(getApplicationContext(), BraintreePaymentActivity.class);
+                    intent.putExtra(BraintreePaymentActivity.EXTRA_CLIENT_TOKEN, clientToken);
+                    startActivityForResult(intent, 100);
+                }
+                if (DEBUG_MODE)
+                    Toast.makeText(getApplicationContext(), "got token", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+
+    public void onBraintreeSubmit(View v) {
+        getClientTokenFromServer();
+    }
+
+
+    protected void getInfoOfProduct(int id_shop, int id_product, int id_instance) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+
+        params.put("idShop", id_shop);
+        params.put("idProduct", id_product);
+        params.put("idInstance", id_instance);
+        client.post("http://ec2-52-27-136-49.us-west-2.compute.amazonaws.com/getInfo.php", params,
+                new AsyncHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int i, Header[] headers, byte[] bytes) {
+                        Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
+                        String productResult = new String(bytes);
+                        String[] values = productResult.split("_");
+                        String name = values[1];
+                        String photoUrl = values[0];
+                        float price = Float.parseFloat(values[2]);
+                        boolean deliverable = Boolean.parseBoolean(values[3]);
+                        productList.add(new Product(name,photoUrl,price,deliverable));
+                        productAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+                        Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_SHORT).show();
+
+                    }
+                    // Your implementation here
+                }
+        );
+    }
+
+    void postNonceToServer(String nonce) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("payment_method_nonce", nonce);
+        params.put("delivery", deliverable);
+        params.put("idShop", id_shop);
+        params.put("idProduct", id_product);
+        params.put("idInstance", id_instance);
+        client.post("http://ec2-52-27-136-49.us-west-2.compute.amazonaws.com/pay.php", params,
+                new AsyncHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int i, Header[] headers, byte[] bytes) {
+                        Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
+                        ((TextView) findViewById(R.id.text)).setText(new String(bytes));
+                    }
+
+                    @Override
+                    public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+                        Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_SHORT).show();
+
+                    }
+                    // Your implementation here
+                }
+        );
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == BraintreePaymentActivity.RESULT_OK) {
+                String paymentMethodNonce = data.getStringExtra(BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE);
+                postNonceToServer(paymentMethodNonce);
+            }
+        }
     }
 
     @Override
