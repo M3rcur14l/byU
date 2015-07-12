@@ -12,23 +12,40 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListActivity extends Activity {
 
     private PendingIntent nfcPendingIntent;
     private IntentFilter[] intentFiltersArray;
     private NfcAdapter nfcAdpt;
-    private TextView tagsView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-        tagsView = (TextView) findViewById(R.id.tags);
+        final ListView productListView = (ListView) findViewById(R.id.product_list);
+        List<Product> productList = new ArrayList<>();
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+        productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
+
+        ProductAdapter productAdapter = new ProductAdapter(this, 0, productList);
+        productListView.setAdapter(productAdapter);
+
         Intent nfcIntent = new Intent(this, getClass());
         nfcIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
@@ -65,6 +82,7 @@ public class ListActivity extends Activity {
     }
 
     private void getTag(Intent i) throws UnsupportedEncodingException {
+
         if (i == null)
             return;
 
@@ -84,10 +102,8 @@ public class ListActivity extends Activity {
 
                 NdefRecord[] records = msg.getRecords();
                 for (NdefRecord record : records) {
-                    String text = tagsView.getText().toString();
                     byte[] payload = record.getPayload();
                     String payloadText = new String(payload, "UTF-8");
-                    tagsView.setText(text.concat(payloadText));
                 }
             }
 

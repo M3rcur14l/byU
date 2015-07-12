@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#50000000">
+    android:background="@drawable/round_corners">
 
     <ImageView
         android:id="@+id/product_image"
@@ -28,11 +28,19 @@
         android:id="@+id/product_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="40dp"
         android:text="€ 600"
         android:textColor="@android:color/white"
         android:textSize="25sp" />
+
+    <ImageView
+        android:id="@+id/deliverable_image"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/scatola2"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/product_image"/>
 
 </RelativeLayout>
