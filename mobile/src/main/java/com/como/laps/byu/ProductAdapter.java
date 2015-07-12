@@ -34,11 +34,15 @@ public class ProductAdapter extends ArrayAdapter<Product> {
         if (v == null) {
             v = inflater.inflate(R.layout.rowlayout, null);
 
+            Product product = products.get(position);
             // cache view fields into the holder
             holder = new ViewHolder();
             holder.productName = (TextView) v.findViewById(R.id.product_name);
+            holder.productName.setText(product.getName());
             holder.productImage = (ImageView) v.findViewById(R.id.product_image);
+            //to do: download image
             holder.productPrice = (TextView) v.findViewById(R.id.product_price);
+            holder.productPrice.setText(String.valueOf("€ " + product.getPrice()));
             holder.derivable = (ImageView) v.findViewById(R.id.deliverable_image);
 
             // associate the holder with the view for later lookup

@@ -202,7 +202,7 @@ public class ListActivity extends Activity {
                         for (Product p : productList) {
                             totalPrice += p.getPrice();
                         }
-                        totalPriceView.setText(String.valueOf(totalPrice));
+                        totalPriceView.setText("Total: €" + String.valueOf(totalPrice));
 
                     }
 
@@ -233,6 +233,8 @@ public class ListActivity extends Activity {
                         NdefRecord record = NdefRecord.createTextRecord("en", unlockCode);
                         NdefMessage ndefMessage = new NdefMessage(record);
                         nfcAdpt.setNdefPushMessage(ndefMessage, ListActivity.this);
+                        productList.clear();
+                        productAdapter.notifyDataSetChanged();
                     }
 
                     @Override
