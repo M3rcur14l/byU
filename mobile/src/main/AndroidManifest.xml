@@ -13,16 +13,23 @@
             android:name=".ListActivity"
             android:label="@string/app_name" >
             <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="ext"
+                    android:pathPrefix="/com.laps:byu"
+                    android:scheme="vnd.android.nfc" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ReadyToScanActivity"
+            android:label="@string/title_activity_ready_to_scan" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="vnd.android.nfc"
-                    android:host="ext"
-                    android:pathPrefix="/com.laps:byu"/>
             </intent-filter>
         </activity>
     </application>

@@ -4,14 +4,20 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,11 +30,19 @@ public class ListActivity extends Activity {
     private PendingIntent nfcPendingIntent;
     private IntentFilter[] intentFiltersArray;
     private NfcAdapter nfcAdpt;
+    private List<Product> productList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getRealSize(size);
+        final View layout = findViewById(R.id.list_layout);
+        Bitmap b = BitmapUtils.getBitmap("background.png", this, size.x, size.y);
+        BitmapDrawable background = new BitmapDrawable(getResources(), b);
+        layout.setBackground(background);
         final ListView productListView = (ListView) findViewById(R.id.product_list);
         List<Product> productList = new ArrayList<>();
         productList.add(new Product("iohoihsoic", "Iphone 6", "Photo", 600f, true));
@@ -94,7 +108,6 @@ public class ListActivity extends Activity {
             Parcelable[] parcs = i.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
             // List record
-
 
             for (Parcelable p : parcs) {
                 NdefMessage msg = (NdefMessage) p;
