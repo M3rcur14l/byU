@@ -36,6 +36,8 @@ public class ListActivity extends Activity {
     private NfcAdapter nfcAdpt;
     private List<Product> productList;
     private ProductAdapter productAdapter;
+    private float totalPrice;
+    private TextView totalPriceView;
     private String clientToken = "";
     private final static int REQUEST_CODE = 100;
     private final static boolean DEBUG_MODE = true;
@@ -51,6 +53,8 @@ public class ListActivity extends Activity {
 
         productAdapter = new ProductAdapter(this, 0, productList);
         productListView.setAdapter(productAdapter);
+
+        totalPriceView = (TextView) findViewById(R.id.total_textview);
 
         Intent nfcIntent = new Intent(this, getClass());
         nfcIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -192,8 +196,14 @@ public class ListActivity extends Activity {
                         String photoUrl = values[0];
                         float price = Float.parseFloat(values[2]);
                         boolean deliverable = Boolean.parseBoolean(values[3]);
-                        productList.add(new Product(name,photoUrl,price,deliverable));
+                        productList.add(new Product(name, photoUrl, price, deliverable));
                         productAdapter.notifyDataSetChanged();
+                        totalPrice = 0f;
+                        for (Product p : productList) {
+                            totalPrice += p.getPrice();
+                        }
+                        totalPriceView.setText(String.valueOf(totalPrice));
+
                     }
 
                     @Override
